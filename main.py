@@ -52,5 +52,6 @@ def main():
         textures.assign_material_to_object(leather_mat, animated_ball)
 
     lights.create_area_light()
+    lights.create_pt_lights()
 
 main()
