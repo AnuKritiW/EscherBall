@@ -21,7 +21,7 @@ def is_overlap(p_x_pos, p_y_pos, p_fr_width, p_fr_height, p_frame_data_list):
 # TODO: if the wall remains a square, consider renaming the width parameter and removing the height parameter
 def is_frame_placed_on_wall(p_fr_width, p_fr_height, p_frame_data_list, p_wall_width, p_wall_height):
     # Try upto 100 times to place the frame
-    max_attempts = 100
+    max_attempts = 300
     for _ in range(max_attempts):
         # Randomly choose a position for the frame
         x_pos = random.uniform(((-p_wall_width / 2) + (p_fr_width / 2)), ((p_wall_width / 2) - (p_fr_width / 2)))
@@ -47,7 +47,7 @@ def create_frames_on_wall(portraits):
         frame_type = 'rectangular' # TODO: Add more shapes
 
         if frame_type == 'rectangular':
-            frame, fr_width, fr_height = create_rectangular_frame(p_width = random.uniform(4, 8), p_height = random.uniform(3, 9))
+            frame, fr_width, fr_height = create_rectangular_frame(p_width = random.uniform(8, 12), p_height = random.uniform(8, 12))
 
         # If placement fails, delete the frame
         sq_wall_size = (SQ_WALL_SIZE - 3) # padding around the boundaries of the wall
@@ -114,6 +114,7 @@ def create_walls(portraits, bricks):
     walls_grp = cmds.group([left_wall, right_wall], name = "Walls")
     cmds.xform(walls_grp,
                t = (11.637219585894766, 0, -32.82290721133882),
+                # t = (11.637, 5.45, 17.083), # remove floor, bring walls closer.
                ro = (0.0, -131.41189034927982, 0.0))
 
 def create_floor():

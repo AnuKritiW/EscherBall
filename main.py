@@ -3,8 +3,8 @@ import importlib.util
 import os
 
 # Manually specify the directory where your scripts are located
-# script_dir = r'C:\Users\anukr\Desktop\Code\maya-scripts'  # Use raw string for Windows path
-script_dir = r'/home/s5647918/Code/maya-scripts'
+script_dir = r'C:\Users\anukr\Desktop\Code\maya-scripts'  # Use raw string for Windows path
+# script_dir = r'/home/s5647918/Code/maya-scripts'
 # TODO: get path dynamically; change path to match machine until then
 
 # Function to dynamically import a module from a file
@@ -46,12 +46,19 @@ def main():
     if black_tile_mat:
         textures.assign_material_to_object(black_tile_mat, floor)
 
-    leather_mat = textures.import_material('leather')
-    animated_ball = ball.create_and_animate_ball()
-    if leather_mat:
-        textures.assign_material_to_object(leather_mat, animated_ball)
+    ball_obj = ball.create_ball()
+    print(f"Ball object created: {ball_obj}")  # Debugging ball creation
+    shader = lights.create_emissive_shader(ball_obj)
+    print(f"Shader assigned to ball: {shader}")  # Debugging shader assignment
+    ball.animate_ball_helper(ball_obj, shader)
+
+    # leather_mat = textures.import_material('leather')
+    # animated_ball = ball.create_and_animate_ball()
+    # if leather_mat:
+    #     textures.assign_material_to_object(leather_mat, animated_ball)
 
     lights.create_area_light()
     lights.create_pt_lights()
+    # lights.make_object_emissive(animated_ball, (0.106, 0.384, 0.839))
 
 main()

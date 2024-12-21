@@ -66,16 +66,22 @@ def create_pt_light(frame):
     cmds.xform(light_transform, worldSpace=True, translation=light_position)
 
     y_position = light_position[1]
-    max_intensity = 40.0
+    max_intensity = 30.0
     mid_intensity = 20.0
-    min_intensity = 5.0
+    min_intensity = 10.0
+
+    # max_intensity = 20.0
+    # mid_intensity = 10.0
+    # min_intensity = 5.0
 
     # Map the Y position to intensity
     intensity = mid_intensity + (y_position * 1.0)
     intensity = max(min_intensity, min(intensity, max_intensity))
 
     cmds.setAttr(light_shape + ".intensity", intensity)
-    cmds.setAttr(f'{light_shape}.color', 0.301, 0.181, 0.114, type='double3')
+    # cmds.setAttr(f'{light_shape}.color', 0.301, 0.181, 0.114, type='double3')
+    cmds.setAttr(f'{light_shape}.color', 1, 1, 1, type='double3')
+
 
     return light_shape
 
@@ -93,3 +99,44 @@ def create_pt_lights():
     lights_grp = cmds.group(pt_lights, name = "point_lights")
     return lights_grp
 
+def make_object_emissive(object_name, emission_color=(1, 1, 1), intensity=40):
+    # Create an Arnold Standard Surface shader
+    shader = cmds.shadingNode('aiStandardSurface', asShader=True, name=f"{object_name}_emissiveShader")
+
+    # Assign the shader to the object
+    shading_group = cmds.sets(renderable=True, noSurfaceShader=True, empty=True, name=f"{shader}SG")
+    cmds.connectAttr(f"{shader}.outColor", f"{shading_group}.surfaceShader", force=True)
+    cmds.sets(object_name, edit=True, forceElement=shading_group)
+
+    # Enable emission and set its properties
+    cmds.setAttr(f"{shader}.emission", 1)  # Enable emission
+    cmds.setAttr(f"{shader}.emissionColor", *emission_color, type="double3")  # Set color
+    cmds.setAttr(f"{shader}.emissionStrength", intensity)  # Set intensity
+
+    return shader
+
+def create_emissive_shader(object_name, intensity=40):
+    """
+    Create an Arnold Standard Surface shader with emissive properties and assign it to the object.
+    """
+    # Create the shader
+    shader = cmds.shadingNode('aiStandardSurface', asShader=True, name=f"{object_name}_emissiveShader")
+    print(f"Shader created: {shader}")  # Debug shader name
+
+    # Check shader type
+    shader_type = cmds.nodeType(shader)
+    print(f"Shader type: {shader_type}")  # Should be 'aiStandardSurface'
+    if shader_type != 'aiStandardSurface':
+        raise RuntimeError(f"Shader {shader} is not of type 'aiStandardSurface'.")
+
+    # Create shading group and assign shader
+    shading_group = cmds.sets(renderable=True, noSurfaceShader=True, empty=True, name=f"{shader}SG")
+    cmds.connectAttr(f"{shader}.outColor", f"{shading_group}.surfaceShader", force=True)
+    cmds.sets(object_name, edit=True, forceElement=shading_group)
+
+    # Enable emission and set intensity
+    cmds.setAttr(f"{shader}.emission", intensity)  # Set intensity of emission
+    cmds.setAttr(f"{shader}.emissionColor", 1.0, 1.0, 1.0, type="double3")  # Default to white emission color
+
+    print(f"Emissive shader {shader} created and assigned to {object_name}.")
+    return shader

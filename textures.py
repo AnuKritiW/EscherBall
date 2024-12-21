@@ -16,8 +16,8 @@ def create_textures():
     return materials
 
 def create_material(p_portrait, p_offset_level):
-    image_sequence_path = f'/home/s5647918/Code/maya-scripts/portraits/{p_portrait}_seq/{p_portrait}_1.png'
-    # image_sequence_path= f'C:/Users/anukr/Desktop/Code/maya-scripts/portraits/{p_portrait}_seq/{p_portrait}_1.png'
+    # image_sequence_path = f'/home/s5647918/Code/maya-scripts/portraits/{p_portrait}_seq/{p_portrait}_1.png'
+    image_sequence_path= f'C:/Users/anukr/Desktop/Code/maya-scripts/portraits/{p_portrait}_seq/{p_portrait}_1.png'
 
     # Create a new material (Lambert or Phong)
     material = cmds.shadingNode('lambert', asShader=True, name=f'{p_portrait}_material')
@@ -66,8 +66,8 @@ def create_material(p_portrait, p_offset_level):
 
 def create_brick_material(repeatU=16, repeatV=24):
     material_name="brickMaterial"
-    texture_file_path = f'./textures/brick-wall-texture.jpg'
-    # texture_file_path = f'C:/Users/anukr/Desktop/Code/maya-scripts/brick-wall-texture.jpg'
+    # texture_file_path = f'./textures/brick-wall-texture.jpg'
+    texture_file_path = f'C:/Users/anukr/Desktop/Code/maya-scripts/textures/brick-wall-texture.jpg'
 
     # Create a Lambert material
     material = cmds.shadingNode('lambert', asShader=True, name=material_name)
@@ -106,7 +106,8 @@ def import_material(material_name):
     materials_before_import = set(cmds.ls(materials=True))
 
     # Specify the file path to the .mb file containing the material
-    file_path = '/home/s5647918/Code/maya-scripts/textures/' + material_name + '.mb'
+    # file_path = '/home/s5647918/Code/maya-scripts/textures/' + material_name + '.mb'
+    file_path = f'C:/Users/anukr/Desktop/Code/maya-scripts/textures/' + material_name + '.mb'
 
     # Import the material with extra options to mimic Hypershade behavior
     cmds.file(file_path, i=True, type='mayaBinary', ignoreVersion=True, mergeNamespacesOnClash=True, namespace=":")
