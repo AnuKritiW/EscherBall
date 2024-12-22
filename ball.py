@@ -64,7 +64,7 @@ Parameters:
                            while smaller values create a flatter, more gradual bounce.
 """
 
-def animate_ball(p_ball, shader, p_step_top_coords, fps=25, duration=10, bounce_height=5, bounce_factor=4, squash_factor=0.2):
+def animate_ball(p_ball, shader, p_step_top_coords, fps=25, duration=10, bounce_height=5, bounce_factor=4, squash_factor=0.3):
     """
     Animate the ball and change its emissive color every time it lands on a step.
     """

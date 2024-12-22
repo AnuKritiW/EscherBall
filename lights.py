@@ -22,6 +22,7 @@ def create_area_light():
 
     # Set Arnold area light attributes on the shape node
     cmds.setAttr(f'{light_shape}.color', 0.301, 0.181, 0.114, type='double3')
+    # cmds.setAttr(f'{light_shape}.color', 0.6, 0.2, 0.8, type='double3')
     cmds.setAttr(f'{light_shape}.intensity', 7.869)
     cmds.setAttr(f'{light_shape}.exposure', 0.249)
     cmds.setAttr(f'{light_shape}.normalize', 0)  # Disable normalization
@@ -139,4 +140,15 @@ def create_emissive_shader(object_name, intensity=40):
     cmds.setAttr(f"{shader}.emissionColor", 1.0, 1.0, 1.0, type="double3")  # Default to white emission color
 
     print(f"Emissive shader {shader} created and assigned to {object_name}.")
+    return shader
+
+def create_emissive_shader_frame(shader_name="shared_emissive_shader", emission_color=(1, 1, 1), intensity=10):
+    """
+    Create a single emissive shader to be shared across all faces.
+    """
+    shader = cmds.shadingNode('aiStandardSurface', asShader=True, name=shader_name)
+    shading_group = cmds.sets(renderable=True, noSurfaceShader=True, empty=True, name=f"{shader}SG")
+    cmds.connectAttr(f"{shader}.outColor", f"{shading_group}.surfaceShader", force=True)
+    cmds.setAttr(f"{shader}.emission", intensity)  # Enable emission
+    cmds.setAttr(f"{shader}.emissionColor", *emission_color, type="double3")  # Set emission color
     return shader

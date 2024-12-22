@@ -39,7 +39,7 @@ def create_rectangular_frame(p_width, p_height):
     frame = cmds.polyCube(w = p_width, h = p_height, d = 0.2, name = "Rectangular_Frame")[0]
     return (frame, p_width, p_height)
 
-def create_frames_on_wall(portraits):
+def create_frames_on_wall(portraits, shader):
     num_frames = 400
     frame_data_list = []
     frame_list = []
@@ -68,18 +68,37 @@ def create_frames_on_wall(portraits):
             if fr_width > fr_height:
                 cmds.polyEditUV(frame + '.f[0]', r=True, angle=90)  # Rotate the UVs by 90 degrees
 
+            apply_emissive_texture_to_faces(frame, shader)
+
             frame_list.append(frame)
 
     return frame_list
 
-def create_wall(p_transform_dict, p_wall_name, portraits, bricks):
+def apply_emissive_texture_to_faces(frame, shader):
+    """
+    Apply the same emissive texture to faces 1, 3, 4, and 5 of a cube.
+    """
+    # Ensure the cube exists
+    if not cmds.objExists(frame):
+        print(f"frame {frame} does not exist.")
+        return
+
+    # List of specific faces to apply the texture
+    target_faces = [f"{frame}.f[1]", f"{frame}.f[3]", f"{frame}.f[4]", f"{frame}.f[5]"]
+
+    # Assign the shader to each face
+    for face in target_faces:
+        cmds.select(face, replace=True)
+        cmds.hyperShade(assign=shader)
+
+def create_wall(p_transform_dict, p_wall_name, portraits, bricks, shader):
     wall = cmds.polyCube(w = p_transform_dict['sx'], h = p_transform_dict['sy'], d = p_transform_dict['sz'], name = p_wall_name)[0]
     cmds.move(0, p_transform_dict['sy'] / 2, 0)
 
     cmds.select(wall)
     cmds.hyperShade(assign=bricks)
 
-    frames_list = create_frames_on_wall(portraits)
+    frames_list = create_frames_on_wall(portraits, shader)
     frames_grp = cmds.group(frames_list, name = "Frames")
 
     wall_with_frames = cmds.group([wall, frames_grp], name = (p_wall_name + "_with_Frames"))
@@ -91,7 +110,7 @@ def create_wall(p_transform_dict, p_wall_name, portraits, bricks):
 
     return wall_with_frames
 
-def create_walls(portraits, bricks):
+def create_walls(portraits, bricks, shader):
     # left wall
     transform_dict = {'tx': -10.571,
                       'ty': -33,
@@ -102,13 +121,13 @@ def create_walls(portraits, bricks):
                       'sx': SQ_WALL_SIZE,
                       'sy': SQ_WALL_SIZE,
                       'sz': 0.2}
-    left_wall = create_wall(transform_dict, "Left_Wall", portraits, bricks)
+    left_wall = create_wall(transform_dict, "Left_Wall", portraits, bricks, shader)
 
     # right wall
     transform_dict['tx'] = -42.995
     transform_dict['tz'] = 8.603
     transform_dict['ry'] = 89.478 # Rotate to help with the illusion
-    right_wall = create_wall(transform_dict, "Right_Wall", portraits, bricks)
+    right_wall = create_wall(transform_dict, "Right_Wall", portraits, bricks, shader)
 
     # TODO: optimize this bit by getting the transformations right the first time
     walls_grp = cmds.group([left_wall, right_wall], name = "Walls")

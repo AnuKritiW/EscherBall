@@ -39,7 +39,8 @@ def main():
 
     materials = textures.create_textures()
     bricks = textures.create_brick_material()
-    scene.create_walls(materials, bricks)
+    frame_edge_shader = lights.create_emissive_shader_frame(emission_color=(0.6, 0.8, 1.0), intensity=5)
+    scene.create_walls(materials, bricks, frame_edge_shader)
 
     black_tile_mat = textures.import_material('black_tile')
     floor = scene.create_floor()
