@@ -1,7 +1,7 @@
 import maya.cmds as cmds
 import maya.api.OpenMaya as om
 
-def create_area_light():
+def setup_area_light():
     # Ensure the Arnold plugin is loaded
     if not cmds.pluginInfo('mtoa', query=True, loaded=True):
         cmds.loadPlugin('mtoa')
@@ -42,7 +42,7 @@ def get_face_normal_in_world_space(_mesh, _face_index=0):
 
     return [normal_vector.x, normal_vector.y, normal_vector.z]
 
-def create_pt_light(_frame):
+def setup_single_pt_light(_frame):
     # Get the current position of the frame
     pos = cmds.xform(_frame, query=True, worldSpace=True, translation=True)
 
@@ -76,13 +76,13 @@ def create_pt_light(_frame):
 
     return light_shape
 
-def create_pt_lights():
+def setup_pt_lights():
     rectangular_frames = cmds.ls('Rectangular_Frame*', long=True) # Name decided in scene.create_frame
     pt_lights = []
 
     for frame in rectangular_frames:
         if 'Rectangular_Frame' in frame and cmds.objectType(frame) == 'transform':
-            light_shape = create_pt_light(frame)
+            light_shape = setup_single_pt_light(frame)
             pt_lights.append(light_shape)
 
     lights_grp = cmds.group(pt_lights, name = "point_lights")

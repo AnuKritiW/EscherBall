@@ -25,7 +25,7 @@ def main():
     # Import the scripts
     for script in scripts_to_import:
         script_path = os.path.join(SCRIPT_DIR, script)
-        module_name = script[:-3]  # Remove the .py extension
+        module_name = script[:-3]  # Removes the .py extension
         globals()[module_name] = import_module(module_name, script_path)
 
     # Generate stairs model
@@ -40,15 +40,15 @@ def main():
     camera.set_perspective_camera()
 
     # Get materials needed for walls
-    portrait_mats     = material_manager.prep_portrait_mats(SCRIPT_DIR)
     brick_mat         = material_manager.prep_brick_mat(SCRIPT_DIR)
+    portrait_mats     = material_manager.prep_portrait_mats(SCRIPT_DIR)
     frame_edge_shader = material_manager.prep_emissive_shader(_shader_name="frame_emissive_shader", _emission_color=(0.6, 0.8, 1.0), _intensity=5)
 
     # Generate walls
-    scene.create_walls(portrait_mats, brick_mat, frame_edge_shader)
+    scene.generate_walls(brick_mat, portrait_mats, frame_edge_shader)
 
     # Generate floor model
-    floor = scene.create_floor()
+    floor = scene.generate_floor()
 
     # Assign Black Tile Mat to floor
     black_tile_mat = material_manager.import_mat(SCRIPT_DIR, 'black_tile')
@@ -65,7 +65,7 @@ def main():
     ball_manager.animate_ball_helper(ball, ball_shader)
 
     # Set up scene lights
-    scene_lighting.create_area_light()
-    scene_lighting.create_pt_lights()
+    scene_lighting.setup_area_light()
+    scene_lighting.setup_pt_lights()
 
 main()
