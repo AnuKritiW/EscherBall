@@ -39,12 +39,12 @@ def apply_emissive_texture_to_faces(_frame, _frame_edges_shader):
     Apply the same emissive texture to faces 1, 3, 4, and 5 of a cube.
     """
     # Ensure the cube exists
-    if not cmds.objExists(frame):
-        print(f"frame {frame} does not exist.")
+    if not cmds.objExists(_frame):
+        print(f"frame {_frame} does not exist.")
         return
 
     # List of specific faces to apply the texture
-    target_faces = [f"{frame}.f[1]", f"{frame}.f[3]", f"{frame}.f[4]", f"{frame}.f[5]"]
+    target_faces = [f"{_frame}.f[1]", f"{_frame}.f[3]", f"{_frame}.f[4]", f"{_frame}.f[5]"]
 
     # Assign the shader to each face
     for face in target_faces:
@@ -65,7 +65,7 @@ def hang_frames(_portrait_mats, _frame_edges_shader):
         # If placement fails, delete the frame
         sq_wall_size = (SQ_WALL_SIZE - 3) # padding around the boundaries of the wall
 
-        if not is_frame_placed_on_wall(fr_width, fr_height, frame_data_list, sq_wall_size, sq_wall_size):
+        if not is_frame_placed_on_wall(fr_width, fr_height, frame_data_list, sq_wall_size):
             cmds.delete(frame)
         else:
             cmds.select(frame + '.f[0]')  # Select the front face
