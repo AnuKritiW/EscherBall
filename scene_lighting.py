@@ -116,39 +116,10 @@ def make_object_emissive(object_name, emission_color=(1, 1, 1), intensity=40):
 
     return shader
 
-def create_emissive_shader(object_name, intensity=40):
-    """
-    Create an Arnold Standard Surface shader with emissive properties and assign it to the object.
-    """
-    # Create the shader
-    shader = cmds.shadingNode('aiStandardSurface', asShader=True, name=f"{object_name}_emissiveShader")
-    print(f"Shader created: {shader}")  # Debug shader name
-
-    # Check shader type
-    shader_type = cmds.nodeType(shader)
-    print(f"Shader type: {shader_type}")  # Should be 'aiStandardSurface'
-    if shader_type != 'aiStandardSurface':
-        raise RuntimeError(f"Shader {shader} is not of type 'aiStandardSurface'.")
-
-    # Create shading group and assign shader
+def create_emissive_shader(_shader_name, _emission_color=(1, 1, 1), _intensity=40):
+    shader = cmds.shadingNode('aiStandardSurface', asShader=True, name=_shader_name)
     shading_group = cmds.sets(renderable=True, noSurfaceShader=True, empty=True, name=f"{shader}SG")
     cmds.connectAttr(f"{shader}.outColor", f"{shading_group}.surfaceShader", force=True)
-    cmds.sets(object_name, edit=True, forceElement=shading_group)
-
-    # Enable emission and set intensity
-    cmds.setAttr(f"{shader}.emission", intensity)  # Set intensity of emission
-    cmds.setAttr(f"{shader}.emissionColor", 1.0, 1.0, 1.0, type="double3")  # Default to white emission color
-
-    print(f"Emissive shader {shader} created and assigned to {object_name}.")
-    return shader
-
-def create_emissive_shader_frame(shader_name="shared_emissive_shader", emission_color=(1, 1, 1), intensity=10):
-    """
-    Create a single emissive shader to be shared across all faces.
-    """
-    shader = cmds.shadingNode('aiStandardSurface', asShader=True, name=shader_name)
-    shading_group = cmds.sets(renderable=True, noSurfaceShader=True, empty=True, name=f"{shader}SG")
-    cmds.connectAttr(f"{shader}.outColor", f"{shading_group}.surfaceShader", force=True)
-    cmds.setAttr(f"{shader}.emission", intensity)  # Enable emission
-    cmds.setAttr(f"{shader}.emissionColor", *emission_color, type="double3")  # Set emission color
+    cmds.setAttr(f"{shader}.emission", _intensity)  # Enable emission
+    cmds.setAttr(f"{shader}.emissionColor", *_emission_color, type="double3") # Set emission color
     return shader

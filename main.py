@@ -29,12 +29,12 @@ def main():
         globals()[module_name] = import_module(module_name, script_path)
 
     # Generate stairs model
-    stairs_grp = escher_stairs.generate_stairs()
+    stairs = escher_stairs.generate_stairs()
 
     # Assign Marble Mat to stairs
     marble_mat = material_manager.import_mat(SCRIPT_DIR, 'marble')
     if marble_mat:
-        material_manager.assign_material_to_object(marble_mat, stairs_grp)
+        material_manager.assign_material_to_object(marble_mat, stairs)
 
     # Set up Camera
     camera.set_perspective_camera()
@@ -42,7 +42,7 @@ def main():
     # Get materials needed for walls
     portrait_mats     = material_manager.create_portrait_mats(SCRIPT_DIR)
     brick_mat         = material_manager.create_brick_mat(SCRIPT_DIR)
-    frame_edge_shader = scene_lighting.create_emissive_shader_frame(emission_color=(0.6, 0.8, 1.0), intensity=5)
+    frame_edge_shader = scene_lighting.create_emissive_shader(_shader_name="frame_emissive_shader", _emission_color=(0.6, 0.8, 1.0), _intensity=5)
 
     # Generate walls
     scene.create_walls(portrait_mats, brick_mat, frame_edge_shader)
@@ -58,8 +58,9 @@ def main():
     # Generate ball
     ball = ball_manager.create_ball()
 
-    # Get ball emissive shader
-    shader = scene_lighting.create_emissive_shader(ball)
+    # Create ball emissive shader and set
+    shader = scene_lighting.create_emissive_shader(_shader_name="ball_emissive_shader", _intensity=10)
+    cmds.sets(ball, edit=True, forceElement=shading_group)
 
     # Animate ball
     ball_manager.animate_ball_helper(ball, shader)
