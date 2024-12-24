@@ -3,6 +3,21 @@ import random
 
 SQ_WALL_SIZE = 67
 
+def apply_emissive_texture_to_faces(_frame, _frame_edges_shader):
+    """
+    Apply the same emissive texture to faces 1, 3, 4, and 5 of a cube.
+    """
+    if not cmds.objExists(_frame):
+        return
+
+    # List of specific faces to apply the texture
+    target_faces = [f"{_frame}.f[1]", f"{_frame}.f[3]", f"{_frame}.f[4]", f"{_frame}.f[5]"]
+
+    # Assign the shader to each face
+    for face in target_faces:
+        cmds.select(face, replace=True)
+        cmds.hyperShade(assign=_frame_edges_shader)
+
 def is_overlap(_x_pos, _y_pos, _fr_width, _fr_height, _frame_data_list):
     for frame_data in _frame_data_list:
         curr_fr_x, curr_fr_y, curr_fr_width, curr_fr_height = frame_data
@@ -34,26 +49,9 @@ def is_frame_placed_on_wall(_fr_width, _fr_height, _frame_data_list, _wall_size)
 
     return False
 
-def apply_emissive_texture_to_faces(_frame, _frame_edges_shader):
-    """
-    Apply the same emissive texture to faces 1, 3, 4, and 5 of a cube.
-    """
-    # Ensure the cube exists
-    if not cmds.objExists(_frame):
-        print(f"frame {_frame} does not exist.")
-        return
-
-    # List of specific faces to apply the texture
-    target_faces = [f"{_frame}.f[1]", f"{_frame}.f[3]", f"{_frame}.f[4]", f"{_frame}.f[5]"]
-
-    # Assign the shader to each face
-    for face in target_faces:
-        cmds.select(face, replace=True)
-        cmds.hyperShade(assign=_frame_edges_shader)
-
-def generate_frame(p_width, p_height):
-    frame = cmds.polyCube(w = p_width, h = p_height, d = 0.2, name = "Rectangular_Frame")[0]
-    return (frame, p_width, p_height)
+def generate_frame(_width, _height):
+    frame = cmds.polyCube(w = _width, h = _height, d = 0.2, name = "Rectangular_Frame")[0]
+    return (frame, _width, _height)
 
 def hang_frames(_portrait_mats, _frame_edges_shader):
     num_frames = 400
@@ -86,9 +84,9 @@ def hang_frames(_portrait_mats, _frame_edges_shader):
 
     return frame_list
 
-def generate_single_wall(p_transform_dict, p_wall_name, _brick_mat, _portrait_mats, _frame_edges_shader):
-    wall = cmds.polyCube(w = p_transform_dict['sx'], h = p_transform_dict['sy'], d = p_transform_dict['sz'], name = p_wall_name)[0]
-    cmds.move(0, p_transform_dict['sy'] / 2, 0)
+def generate_single_wall(_transform_dict, _wall_name, _brick_mat, _portrait_mats, _frame_edges_shader):
+    wall = cmds.polyCube(w = _transform_dict['sx'], h = _transform_dict['sy'], d = _transform_dict['sz'], name = _wall_name)[0]
+    cmds.move(0, _transform_dict['sy'] / 2, 0)
 
     cmds.select(wall)
     cmds.hyperShade(assign=_brick_mat)
@@ -96,11 +94,11 @@ def generate_single_wall(p_transform_dict, p_wall_name, _brick_mat, _portrait_ma
     frames_list = hang_frames(_portrait_mats, _frame_edges_shader)
     frames_grp = cmds.group(frames_list, name = "Frames")
 
-    wall_with_frames = cmds.group([wall, frames_grp], name = (p_wall_name + "_with_Frames"))
+    wall_with_frames = cmds.group([wall, frames_grp], name = (_wall_name + "_with_Frames"))
 
     cmds.xform(wall_with_frames,
-        t  = [p_transform_dict['tx'], p_transform_dict['ty'], p_transform_dict['tz']],
-        ro = [p_transform_dict['rx'], p_transform_dict['ry'], p_transform_dict['rz']],
+        t  = [_transform_dict['tx'], _transform_dict['ty'], _transform_dict['tz']],
+        ro = [_transform_dict['rx'], _transform_dict['ry'], _transform_dict['rz']],
         ws = True)
 
     return wall_with_frames
@@ -124,11 +122,9 @@ def generate_walls(_brick_mat, _portrait_mats, _frame_edges_shader):
     transform_dict['ry'] = 89.478 # Rotate to help with the illusion
     right_wall = generate_single_wall(transform_dict, "Right_Wall", _brick_mat, _portrait_mats, _frame_edges_shader)
 
-    # TODO: optimize this bit by getting the transformations right the first time
     walls_grp = cmds.group([left_wall, right_wall], name = "Walls")
     cmds.xform(walls_grp,
                t = (11.637219585894766, 0, -32.82290721133882),
-                # t = (11.637, 5.45, 17.083), # remove floor, bring walls closer.
                ro = (0.0, -131.41189034927982, 0.0))
 
 def generate_floor():
