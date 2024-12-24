@@ -58,9 +58,8 @@ def main():
     # Generate ball
     ball = ball_manager.create_ball()
 
-    # Create ball emissive shader and set
+    # Get ball emissive shader
     shader = scene_lighting.create_emissive_shader(_shader_name="ball_emissive_shader", _intensity=10)
-    cmds.sets(ball, edit=True, forceElement=shading_group)
 
     # Animate ball
     ball_manager.animate_ball_helper(ball, shader)

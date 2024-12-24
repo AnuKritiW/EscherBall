@@ -116,10 +116,14 @@ def make_object_emissive(object_name, emission_color=(1, 1, 1), intensity=40):
 
     return shader
 
-def create_emissive_shader(_shader_name, _emission_color=(1, 1, 1), _intensity=40):
+def create_emissive_shader(_shader_name, _emission_color=(1, 1, 1), _intensity=40, _obj=None):
     shader = cmds.shadingNode('aiStandardSurface', asShader=True, name=_shader_name)
     shading_group = cmds.sets(renderable=True, noSurfaceShader=True, empty=True, name=f"{shader}SG")
     cmds.connectAttr(f"{shader}.outColor", f"{shading_group}.surfaceShader", force=True)
+
+    if _obj:
+        cmds.sets(_obj, edit=True, forceElement=shading_group)
+
     cmds.setAttr(f"{shader}.emission", _intensity)  # Enable emission
     cmds.setAttr(f"{shader}.emissionColor", *_emission_color, type="double3") # Set emission color
     return shader
