@@ -1,6 +1,5 @@
 import maya.cmds as cmds
 import maya.api.OpenMaya as om
-import math as math
 
 def create_area_light():
     # Ensure the Arnold plugin is loaded
@@ -28,27 +27,27 @@ def create_area_light():
 
     cmds.connectAttr(f'{light_transform}.instObjGroups', 'defaultLightSet.dagSetMembers', nextAvailable=True)
 
-def get_face_normal_in_world_space(mesh, face_index=0):
+def get_face_normal_in_world_space(_mesh, _face_index=0):
     # Create a selection list and get the DAG path
     sel_list = om.MSelectionList()
-    sel_list.add(mesh)
+    sel_list.add(_mesh)
     dag_path = sel_list.getDagPath(0)
 
     # Create an MFnMesh function set for the mesh
     mesh_fn = om.MFnMesh(dag_path)
 
     # Get the normal for the specified face in world space
-    normal_vector = mesh_fn.getPolygonNormal(face_index, om.MSpace.kWorld)
+    normal_vector = mesh_fn.getPolygonNormal(_face_index, om.MSpace.kWorld)
     normal_vector.normalize()  # Ensure the normal is a unit vector
 
     return [normal_vector.x, normal_vector.y, normal_vector.z]
 
-def create_pt_light(frame):
+def create_pt_light(_frame):
     # Get the current position of the frame
-    pos = cmds.xform(frame, query=True, worldSpace=True, translation=True)
+    pos = cmds.xform(_frame, query=True, worldSpace=True, translation=True)
 
-    cmds.select(frame + '.f[0]')  # Select the front face
-    normal = get_face_normal_in_world_space(frame)
+    cmds.select(_frame + '.f[0]')  # Select the front face
+    normal = get_face_normal_in_world_space(_frame)
 
     distance = 1.5
 
@@ -78,7 +77,7 @@ def create_pt_light(frame):
     return light_shape
 
 def create_pt_lights():
-    rectangular_frames = cmds.ls('Rectangular_Frame*', long=True)
+    rectangular_frames = cmds.ls('Rectangular_Frame*', long=True) # Name decided in scene.create_frame
     pt_lights = []
 
     for frame in rectangular_frames:
@@ -88,18 +87,3 @@ def create_pt_lights():
 
     lights_grp = cmds.group(pt_lights, name = "point_lights")
     return lights_grp
-
-def create_emissive_shader(_shader_name, _emission_color=(1, 1, 1), _intensity=40, _obj=None):
-    # Create an Arnold Standard Surface shader
-    shader = cmds.shadingNode('aiStandardSurface', asShader=True, name=_shader_name)
-
-    shading_group = cmds.sets(renderable=True, noSurfaceShader=True, empty=True, name=f"{shader}SG")
-    cmds.connectAttr(f"{shader}.outColor", f"{shading_group}.surfaceShader", force=True)
-
-    if _obj: # Assign the shader to the object
-        cmds.sets(_obj, edit=True, forceElement=shading_group)
-
-    # Enable emission and set its properties
-    cmds.setAttr(f"{shader}.emission", _intensity)  # Enable emission
-    cmds.setAttr(f"{shader}.emissionColor", *_emission_color, type="double3") # Set emission color
-    return shader

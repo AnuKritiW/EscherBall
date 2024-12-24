@@ -4,38 +4,38 @@ import random
 SQ_WALL_SIZE = 67
 
 # TODO: optimize this function
-def is_overlap(p_x_pos, p_y_pos, p_fr_width, p_fr_height, p_frame_data_list):
-    for frame_data in p_frame_data_list:
+def is_overlap(_x_pos, _y_pos, _fr_width, _fr_height, _frame_data_list):
+    for frame_data in _frame_data_list:
         curr_fr_x, curr_fr_y, curr_fr_width, curr_fr_height = frame_data
 
         min_dist_between_fr = 0.2
         # Check for overlap by comparing bounding boxes
-        if not ((p_x_pos + (p_fr_width / 2)  + min_dist_between_fr) < (curr_fr_x - (curr_fr_width  / 2)) or
-                (p_x_pos - (p_fr_width / 2)  - min_dist_between_fr) > (curr_fr_x + (curr_fr_width  / 2)) or
-                (p_y_pos + (p_fr_height / 2) + min_dist_between_fr) < (curr_fr_y - (curr_fr_height / 2)) or
-                (p_y_pos - (p_fr_height / 2) - min_dist_between_fr) > (curr_fr_y + (curr_fr_height / 2))):
+        if not ((_x_pos + (_fr_width / 2)  + min_dist_between_fr) < (curr_fr_x - (curr_fr_width  / 2)) or
+                (_x_pos - (_fr_width / 2)  - min_dist_between_fr) > (curr_fr_x + (curr_fr_width  / 2)) or
+                (_y_pos + (_fr_height / 2) + min_dist_between_fr) < (curr_fr_y - (curr_fr_height / 2)) or
+                (_y_pos - (_fr_height / 2) - min_dist_between_fr) > (curr_fr_y + (curr_fr_height / 2))):
             return True
 
     return False
 
 # TODO: if the wall remains a square, consider renaming the width parameter and removing the height parameter
-def is_frame_placed_on_wall(p_fr_width, p_fr_height, p_frame_data_list, p_wall_width, p_wall_height):
+def is_frame_placed_on_wall(_fr_width, _fr_height, _frame_data_list, _wall_width, _wall_height):
     # Try upto 100 times to place the frame
     max_attempts = 300
     for _ in range(max_attempts):
         # Randomly choose a position for the frame
-        x_pos = random.uniform(((-p_wall_width / 2) + (p_fr_width / 2)), ((p_wall_width / 2) - (p_fr_width / 2)))
-        y_pos = random.uniform((p_fr_height / 2), (p_wall_height - (p_fr_height / 2)))
+        x_pos = random.uniform(((-_wall_width / 2) + (_fr_width / 2)), ((_wall_width / 2) - (_fr_width / 2)))
+        y_pos = random.uniform((_fr_height / 2), (_wall_height - (_fr_height / 2)))
 
         # Check if the frame overlaps with any existing frames
-        if not is_overlap(x_pos, y_pos, p_fr_width, p_fr_height, p_frame_data_list):
+        if not is_overlap(x_pos, y_pos, _fr_width, _fr_height, _frame_data_list):
             cmds.move(x_pos, y_pos, 0.25)  # Slight offset to keep frame on the wall
-            p_frame_data_list.append((x_pos, y_pos, p_fr_width, p_fr_height))
+            _frame_data_list.append((x_pos, y_pos, _fr_width, _fr_height))
             return True
 
     return False
 
-def create_rectangular_frame(p_width, p_height):
+def create_frame(p_width, p_height):
     frame = cmds.polyCube(w = p_width, h = p_height, d = 0.2, name = "Rectangular_Frame")[0]
     return (frame, p_width, p_height)
 
@@ -44,10 +44,7 @@ def create_frames_on_wall(portraits, shader):
     frame_data_list = []
     frame_list = []
     for _ in range(num_frames):
-        frame_type = 'rectangular' # TODO: Add more shapes
-
-        if frame_type == 'rectangular':
-            frame, fr_width, fr_height = create_rectangular_frame(p_width = random.uniform(8, 12), p_height = random.uniform(8, 12))
+        frame, fr_width, fr_height = create_frame(p_width = random.uniform(8, 12), p_height = random.uniform(8, 12))
 
         # If placement fails, delete the frame
         sq_wall_size = (SQ_WALL_SIZE - 3) # padding around the boundaries of the wall

@@ -40,9 +40,9 @@ def main():
     camera.set_perspective_camera()
 
     # Get materials needed for walls
-    portrait_mats     = material_manager.create_portrait_mats(SCRIPT_DIR)
-    brick_mat         = material_manager.create_brick_mat(SCRIPT_DIR)
-    frame_edge_shader = scene_lighting.create_emissive_shader(_shader_name="frame_emissive_shader", _emission_color=(0.6, 0.8, 1.0), _intensity=5)
+    portrait_mats     = material_manager.prep_portrait_mats(SCRIPT_DIR)
+    brick_mat         = material_manager.prep_brick_mat(SCRIPT_DIR)
+    frame_edge_shader = material_manager.prep_emissive_shader(_shader_name="frame_emissive_shader", _emission_color=(0.6, 0.8, 1.0), _intensity=5)
 
     # Generate walls
     scene.create_walls(portrait_mats, brick_mat, frame_edge_shader)
@@ -59,10 +59,10 @@ def main():
     ball = ball_manager.create_ball()
 
     # Get ball emissive shader
-    shader = scene_lighting.create_emissive_shader(_shader_name="ball_emissive_shader", _intensity=10, _obj=ball)
+    ball_shader = material_manager.prep_emissive_shader(_shader_name="ball_emissive_shader", _intensity=10, _obj=ball)
 
     # Animate ball
-    ball_manager.animate_ball_helper(ball, shader)
+    ball_manager.animate_ball_helper(ball, ball_shader)
 
     # Set up scene lights
     scene_lighting.create_area_light()

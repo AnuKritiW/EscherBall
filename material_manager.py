@@ -1,19 +1,19 @@
 import os
 import maya.cmds as cmds
 
-def create_portrait_mats(_script_dir):
+def prep_portrait_mats(_script_dir):
 
     portraits = ['slytherin', 'gryffindor', 'ravenclaw', 'hufflepuff', 'greylady', 'bloodybaron', 'nick', 'fatfriar', 'peeves', 'dumbledore']
     portrait_mats = []
 
     for portrait in portraits:
-        portrait_mats.append(create_single_portrait_mat(_script_dir, portrait, 0))
-        portrait_mats.append(create_single_portrait_mat(_script_dir, portrait, 1.5))
-        portrait_mats.append(create_single_portrait_mat(_script_dir, portrait, 3))
+        portrait_mats.append(prep_single_portrait_mat(_script_dir, portrait, 0))
+        portrait_mats.append(prep_single_portrait_mat(_script_dir, portrait, 1.5))
+        portrait_mats.append(prep_single_portrait_mat(_script_dir, portrait, 3))
 
     return portrait_mats
 
-def create_single_portrait_mat(_script_dir, _portrait, _offset_level):
+def prep_single_portrait_mat(_script_dir, _portrait, _offset_level):
     image_sequence_path = os.path.join(_script_dir, 'portraits', f'{_portrait}_seq', f'{_portrait}_1.png')
 
     # Create a new material (Lambert or Phong)
@@ -60,7 +60,7 @@ def create_single_portrait_mat(_script_dir, _portrait, _offset_level):
 
     return portrait_mat
 
-def create_brick_mat(_script_dir):
+def prep_brick_mat(_script_dir):
     texture_file_path = os.path.join(_script_dir, 'textures', 'brick-wall-texture.jpg')
 
     # Create a Lambert material
@@ -118,3 +118,18 @@ def import_mat(_script_dir, _mat_name):
             return material
 
     return None
+
+def prep_emissive_shader(_shader_name, _emission_color=(1, 1, 1), _intensity=40, _obj=None):
+    # Create an Arnold Standard Surface shader
+    shader = cmds.shadingNode('aiStandardSurface', asShader=True, name=_shader_name)
+
+    shading_group = cmds.sets(renderable=True, noSurfaceShader=True, empty=True, name=f"{shader}SG")
+    cmds.connectAttr(f"{shader}.outColor", f"{shading_group}.surfaceShader", force=True)
+
+    if _obj: # Assign the shader to the object
+        cmds.sets(_obj, edit=True, forceElement=shading_group)
+
+    # Enable emission and set its properties
+    cmds.setAttr(f"{shader}.emission", _intensity)  # Enable emission
+    cmds.setAttr(f"{shader}.emissionColor", *_emission_color, type="double3") # Set emission color
+    return shader
