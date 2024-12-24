@@ -56,13 +56,13 @@ def main():
         material_manager.assign_material_to_object(black_tile_mat, floor)
 
     # Generate ball
-    ball = ball_manager.create_ball()
+    ball = ball_manager.generate_ball()
 
     # Get ball emissive shader
     ball_shader = material_manager.prep_emissive_shader(_shader_name="ball_emissive_shader", _intensity=10, _obj=ball)
 
     # Animate ball
-    ball_manager.animate_ball_helper(ball, ball_shader)
+    ball_manager.setup_ball_animation(ball, ball_shader)
 
     # Set up scene lights
     scene_lighting.setup_area_light()

@@ -58,7 +58,7 @@ def hang_frames(_portrait_mats, _frame_edges_shader):
     frame_data_list = []
     frame_list = []
     for _ in range(num_frames):
-        frame, fr_width, fr_height = generate_frame(p_width = random.uniform(8, 12), p_height = random.uniform(8, 12))
+        frame, fr_width, fr_height = generate_frame(_width=random.uniform(8, 12), _height=random.uniform(8, 12))
 
         # If placement fails, delete the frame
         sq_wall_size = (SQ_WALL_SIZE - 3) # padding around the boundaries of the wall
