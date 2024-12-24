@@ -14,9 +14,6 @@ def create_portrait_mats(_script_dir):
     return portrait_mats
 
 def create_single_portrait_mat(_script_dir, _portrait, _offset_level):
-    # image_sequence_path = f'/home/s5647918/Code/maya-scripts/portraits/{_portrait}_seq/{_portrait}_1.png'
-    # image_sequence_path= f'C:/Users/anukr/Desktop/Code/maya-scripts/portraits/{_portrait}_seq/{_portrait}_1.png'
-    # image_sequence_path = _script_dir / f'portraits/{_portrait}_seq/{_portrait}_1.png'
     image_sequence_path = os.path.join(_script_dir, 'portraits', f'{_portrait}_seq', f'{_portrait}_1.png')
 
     # Create a new material (Lambert or Phong)
@@ -64,10 +61,6 @@ def create_single_portrait_mat(_script_dir, _portrait, _offset_level):
     return portrait_mat
 
 def create_brick_mat(_script_dir):
-
-    # texture_file_path = f'./textures/brick-wall-texture.jpg'
-    # texture_file_path = f'C:/Users/anukr/Desktop/Code/maya-scripts/textures/brick-wall-texture.jpg'
-    # texture_file_path = _script_dir / 'textures/brick-wall-texture.jpg'
     texture_file_path = os.path.join(_script_dir, 'textures', 'brick-wall-texture.jpg')
 
     # Create a Lambert material
@@ -108,9 +101,6 @@ def import_mat(_script_dir, _mat_name):
     materials_before_import = set(cmds.ls(materials=True))
 
     # Specify the file path to the .mb file containing the material
-    # file_path = '/home/s5647918/Code/maya-scripts/textures/' + _mat_name + '.mb'
-    # file_path = f'C:/Users/anukr/Desktop/Code/maya-scripts/textures/' + _mat_name + '.mb'
-    # file_path = _script_dir / f'textures/{_mat_name}.mb'
     file_path = os.path.join(_script_dir, 'textures', f'{_mat_name}.mb')
     print(file_path)
 

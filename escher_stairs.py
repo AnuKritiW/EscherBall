@@ -48,7 +48,7 @@ def generate_stairs():
     step_height, third_flight  = generate_flight_of_stairs(coord_dict, 0,             SQ_STEP_SIZE,  step_height, 4, (num_flights + 1))
     step_height, fourth_flight = generate_flight_of_stairs(coord_dict, -SQ_STEP_SIZE, 0,             step_height, 2, (num_flights + 1))
 
-    stairs_grp = cmds.group([first_step, first_flight, second_flight, third_flight, fourth_flight], name = "Impossible_Stairs")
+    stairs_grp = cmds.group([first_step, first_flight, second_flight, third_flight, fourth_flight], name = "escher_stairs")
 
     # Rotate so we can view the illusion from the front
     cmds.rotate(0, 225, 0, stairs_grp, relative = True)
