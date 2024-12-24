@@ -59,7 +59,7 @@ def main():
     ball = ball_manager.create_ball()
 
     # Get ball emissive shader
-    shader = scene_lighting.create_emissive_shader(_shader_name="ball_emissive_shader", _intensity=10)
+    shader = scene_lighting.create_emissive_shader(_shader_name="ball_emissive_shader", _intensity=10, _obj=ball)
 
     # Animate ball
     ball_manager.animate_ball_helper(ball, shader)
