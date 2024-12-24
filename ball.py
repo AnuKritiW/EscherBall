@@ -1,4 +1,5 @@
 import maya.cmds as cmds
+import random
 
 BALL_RADIUS = 1
 """
@@ -62,13 +63,17 @@ Parameters:
     bounce_factor (float): A scaling factor that affects the width and steepness of the parabolic bounce curve. Larger values result in a steeper bounce,
                            while smaller values create a flatter, more gradual bounce.
 """
-def animate_ball(p_ball, p_step_top_coords, fps=25, duration=10, bounce_height=5, bounce_factor=4, squash_factor=0.2):
+
+def animate_ball(p_ball, shader, p_step_top_coords, fps=25, duration=10, bounce_height=5, bounce_factor=4, squash_factor=0.3):
+    """
+    Animate the ball and change its emissive color every time it lands on a step.
+    """
     total_frames = fps * duration
     num_points = len(p_step_top_coords)
 
     interval = ((total_frames / (num_points - 1)) if (num_points > 1) else 0)  # Time per section between two points
 
-    # Set the exact position at the first step
+    # Set the exact position and color at the first step
     cmds.xform(p_ball, t=p_step_top_coords[0])
     cmds.setKeyframe(p_ball, t=0, attribute='translate')
 
@@ -76,6 +81,10 @@ def animate_ball(p_ball, p_step_top_coords, fps=25, duration=10, bounce_height=5
     cmds.setKeyframe(p_ball, t=0, attribute='scaleX', value=1)
     cmds.setKeyframe(p_ball, t=0, attribute='scaleY', value=1)
     cmds.setKeyframe(p_ball, t=0, attribute='scaleZ', value=1)
+
+    # Change emissive color at the first step
+    cmds.setAttr(f"{shader}.emissionColor", 1, 0, 0, type="double3")  # Start with red
+    cmds.setKeyframe(f"{shader}.emissionColor", t=0)
 
     # Interpolate between points for the bounces
     for i in range(num_points - 1):
@@ -87,23 +96,10 @@ def animate_ball(p_ball, p_step_top_coords, fps=25, duration=10, bounce_height=5
             t = (frame - i * interval) / interval  # Normalized time between 0 and 1
 
             # Calculate the interpolated x and z values
-            # Linear interpolation for the y base --> ensure the base y value from p_step_top_coords is maintained
             x, y_base, z = get_interpolated_vals(t, start_pt, end_pt)
 
             # Apply the parabolic bounce
-            """
-            Calculate the bounce height based on a parabolic equation.
-            The equation models the vertical motion of the ball, peaking at the midpoint (t = 0.5) with a maximum height of `bounce_height`.
-            The bounce_factor adjusts the width of the parabola, controlling how steep the bounce is. 
-            As `t` approaches 0 or 1, the bounce value approaches zero, ensuring the ball is at the step height at the start and end of its motion.
-            """
             bounce = (bounce_height * (1 - (bounce_factor * ((t - 0.5) ** 2))))
-
-            """
-            Ensure the bounce only adds height --> so the ball does not intesect the step
-            Note that when (bounce < 0), it means we do not have a perfect parabola beyond the halfway point
-            i.e. it follows the parabola until we hit the step, and then the curve flattens out instead of going negative
-            """
             y = (y_base + max(0, bounce))
 
             # Squash and stretch based on position
@@ -123,6 +119,11 @@ def animate_ball(p_ball, p_step_top_coords, fps=25, duration=10, bounce_height=5
             cmds.setKeyframe(p_ball, t=frame, attribute='scaleY', value=scale_y)
             cmds.setKeyframe(p_ball, t=frame, attribute='scaleZ', value=scale_xz)
 
+        # Change emissive color when the ball lands on a step
+        color = [random.random(), random.random(), random.random()]  # Generate random color
+        cmds.setAttr(f"{shader}.emissionColor", *color, type="double3")
+        cmds.setKeyframe(f"{shader}.emissionColor", t=(i + 1) * interval)
+
     # Set the exact position at the last step
     cmds.xform(p_ball, t=p_step_top_coords[-1])
     cmds.setKeyframe(p_ball, t=total_frames, attribute='translate')
@@ -133,15 +134,16 @@ def animate_ball(p_ball, p_step_top_coords, fps=25, duration=10, bounce_height=5
     cmds.setKeyframe(p_ball, t=total_frames, attribute='scaleZ', value=1)
 
 
+def create_ball():
+    return cmds.polySphere(radius=BALL_RADIUS)[0]
 
-def create_and_animate_ball():
+def animate_ball_helper(ball, shader):
     step_top_coords = [coord for value in get_stairs_info().values() for _, coord in value]
     step_top_coords.append(step_top_coords[0]) # To ensure the loop is complete
     step_top_coords.reverse()  # So the ball is descending instead of ascending
 
-    ball = cmds.polySphere(radius=BALL_RADIUS)[0]
     cmds.xform(ball, t = step_top_coords[0])
 
-    animate_ball(ball, step_top_coords)
+    animate_ball(ball, shader, step_top_coords)
 
     return ball

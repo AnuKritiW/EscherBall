@@ -15,6 +15,7 @@ images/
 *Swatches/
 .mayaswatches/
 *.tx
+*.nfs*
 
 # Ignore temporary files and directories
 temp/
