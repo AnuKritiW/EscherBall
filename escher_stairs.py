@@ -2,32 +2,32 @@ import maya.cmds as cmds
 
 SQ_STEP_SIZE = 2
 
-def create_step(p_step_height, p_coord_dict):
-    curr_step = cmds.polyCube(w = SQ_STEP_SIZE, h = p_step_height, d = SQ_STEP_SIZE)[0]
+def generate_step(_step_height, _coord_dict):
+    curr_step = cmds.polyCube(w = SQ_STEP_SIZE, h = _step_height, d = SQ_STEP_SIZE)[0]
 
     # Ensure that the newly created step is the active selection
     cmds.select(curr_step)
 
-    # Move pivot to the bottom of the step (Y = -p_step_height / 2)
-    cmds.xform(curr_step, pivots=(0, (-p_step_height / 2), 0), ws = True)
+    # Move pivot to the bottom of the step (Y = -_step_height / 2)
+    cmds.xform(curr_step, pivots=(0, (-_step_height / 2), 0), ws = True)
 
     # Move the step so its base aligns with Y = 0 and position it along the X-axis
-    cmds.move(p_coord_dict['x'], (p_step_height / 2), p_coord_dict['z'], curr_step, ws = True)  # y = (p_step_height / 2) keeps the base at Y=0
+    cmds.move(_coord_dict['x'], (_step_height / 2), _coord_dict['z'], curr_step, ws = True)  # y = (_step_height / 2) keeps the base at Y=0
 
-    return ((p_step_height + 0.25), curr_step)
+    return ((_step_height + 0.25), curr_step)
 
-def generate_flight_of_stairs(p_coord_dict, p_x_delta, p_z_delta, p_step_height, p_num_steps_in_flight, p_flight_num):
+def generate_flight_of_stairs(_coord_dict, _x_delta, _z_delta, _step_height, _num_steps_in_flight, _flight_num):
     num_steps = 0
     steps = []
-    while num_steps < p_num_steps_in_flight:
-        p_coord_dict['x'] += p_x_delta
-        p_coord_dict['z'] += p_z_delta
-        p_step_height, step = create_step(p_step_height, p_coord_dict)
+    while num_steps < _num_steps_in_flight:
+        _coord_dict['x'] += _x_delta
+        _coord_dict['z'] += _z_delta
+        _step_height, step = generate_step(_step_height, _coord_dict)
         steps.append(step)
         num_steps += 1
 
-    steps_grp = cmds.group(steps, name = ("Flight_of_Stairs_" + str(p_flight_num)))
-    return (p_step_height, steps_grp)
+    steps_grp = cmds.group(steps, name = ("Flight_of_Stairs_" + str(_flight_num)))
+    return (_step_height, steps_grp)
 
 def generate_stairs():
     num_steps = 0
@@ -35,7 +35,7 @@ def generate_stairs():
     coord_dict = {'x': -6, 'z': 4} # Values arbitrarily decided after manual testing
 
     # Generate the first step and extrude its front face
-    step_height, first_step = create_step(step_height, coord_dict)
+    step_height, first_step = generate_step(step_height, coord_dict)
 
     first_step = cmds.rename(first_step, "First_Step")
 
@@ -48,7 +48,7 @@ def generate_stairs():
     step_height, third_flight  = generate_flight_of_stairs(coord_dict, 0,             SQ_STEP_SIZE,  step_height, 4, (num_flights + 1))
     step_height, fourth_flight = generate_flight_of_stairs(coord_dict, -SQ_STEP_SIZE, 0,             step_height, 2, (num_flights + 1))
 
-    stairs_grp = cmds.group([first_step, first_flight, second_flight, third_flight, fourth_flight], name = "Impossible_Stairs")
+    stairs_grp = cmds.group([first_step, first_flight, second_flight, third_flight, fourth_flight], name = "escher_stairs")
 
     # Rotate so we can view the illusion from the front
     cmds.rotate(0, 225, 0, stairs_grp, relative = True)
