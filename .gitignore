@@ -20,3 +20,7 @@ images/
 # Ignore temporary files and directories
 temp/
 tmp/
+
+# Exclude specific .mb files from being ignored
+!textures/marble.mb
+!textures/black_tile.mb
