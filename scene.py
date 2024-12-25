@@ -1,3 +1,22 @@
+"""
+Handles scene setup and wall generation.
+
+This module provides functions to:
+- Generate walls with frames and textures.
+- Apply textures and materials to wall components.
+- Check and resolve overlapping frames during placement.
+
+Functions:
+- generate_floor():                  Creates the floor geometry.
+- generate_walls():                  Creates all walls in the scene.
+- generate_single_wall():            Creates a single wall with frames.
+- hang_frames():                     Places multiple frames on walls.
+- generate_frame():                  Creates a single frame geometry.
+- is_frame_placed_on_wall():         Places a frame without overlap.
+- is_overlap():                      Checks for overlap between frames on a wall.
+- apply_emissive_texture_to_faces(): Applies emissive textures to specific faces of a cube.
+"""
+
 import maya.cmds as cmds
 import random
 
@@ -5,8 +24,19 @@ SQ_WALL_SIZE = 67
 
 def apply_emissive_texture_to_faces(_frame, _frame_edges_shader):
     """
-    Apply the same emissive texture to faces 1, 3, 4, and 5 of a cube.
+    Applies an emissive texture to specific faces 1, 3, 4, and 5 of a cube.
+
+    This function targets specific faces of the frame object and assigns the given
+    shader to create an emissive effect.
+
+    Args:
+        _frame (str):              The name of the frame object.
+        _frame_edges_shader (str): The shader to apply to the frame edges.
+
+    Returns:
+        None
     """
+
     if not cmds.objExists(_frame):
         return
 
@@ -19,6 +49,24 @@ def apply_emissive_texture_to_faces(_frame, _frame_edges_shader):
         cmds.hyperShade(assign=_frame_edges_shader)
 
 def is_overlap(_x_pos, _y_pos, _fr_width, _fr_height, _frame_data_list):
+    """
+    Checks if a new frame overlaps with existing frames in the scene.
+
+    This function evaluates whether the bounding box of a proposed frame
+    intersects with any existing frames based on their positions and sizes.
+
+    Args:
+        _x_pos (float):          The x-coordinate of the proposed frame's center.
+        _y_pos (float):          The y-coordinate of the proposed frame's center.
+        _fr_width (float):       The width of the proposed frame.
+        _fr_height (float):      The height of the proposed frame.
+        _frame_data_list (list): A list of tuples containing position and size
+                                 data for existing frames.
+
+    Returns:
+        bool: True if there is an overlap, False otherwise.
+    """
+
     for frame_data in _frame_data_list:
         curr_fr_x, curr_fr_y, curr_fr_width, curr_fr_height = frame_data
 
@@ -33,6 +81,23 @@ def is_overlap(_x_pos, _y_pos, _fr_width, _fr_height, _frame_data_list):
     return False
 
 def is_frame_placed_on_wall(_fr_width, _fr_height, _frame_data_list, _wall_size):
+    """
+    Attempts to place a frame on a wall without overlapping existing frames.
+
+    This function tries multiple random positions on the wall to find a valid
+    spot for the frame, ensuring no overlap with other frames.
+
+    Args:
+        _fr_width (float):       The width of the frame to place.
+        _fr_height (float):      The height of the frame to place.
+        _frame_data_list (list): A list of tuples containing position and size
+                                 data for existing frames.
+        _wall_size (float):      The size of the wall where the frame will be placed.
+
+    Returns:
+        bool: True if the frame is successfully placed, False otherwise.
+    """
+
     # Try upto 300 times to place the frame
     max_attempts = 300
     for _ in range(max_attempts):
@@ -50,10 +115,35 @@ def is_frame_placed_on_wall(_fr_width, _fr_height, _frame_data_list, _wall_size)
     return False
 
 def generate_frame(_width, _height):
+    """
+    Creates a rectangular frame with the specified dimensions.
+
+    Args:
+        _width (float):  The width of the frame.
+        _height (float): The height of the frame.
+
+    Returns:
+        tuple: A tuple containing the frame's name, width, and height.
+    """
+
     frame = cmds.polyCube(w = _width, h = _height, d = 0.2, name = "Rectangular_Frame")[0]
     return (frame, _width, _height)
 
 def hang_frames(_portrait_mats, _frame_edges_shader):
+    """
+    Generates and places multiple frames on the wall.
+
+    This function creates a specified number of rectangular frames, places
+    them on the wall while avoiding overlaps, and applies materials and textures.
+
+    Args:
+        _portrait_mats (list):     A list of portrait material names to apply to the frames.
+        _frame_edges_shader (str): The shader to apply to the frame edges.
+
+    Returns:
+        list: A list of frame object names successfully placed on the wall.
+    """
+
     num_frames = 400
     frame_data_list = []
     frame_list = []
@@ -85,6 +175,23 @@ def hang_frames(_portrait_mats, _frame_edges_shader):
     return frame_list
 
 def generate_single_wall(_transform_dict, _wall_name, _brick_mat, _portrait_mats, _frame_edges_shader):
+    """
+    Generates a single wall with frames and applies materials.
+
+    This function creates a wall object, hangs frames on it, and groups
+    the wall and frames under a single parent node.
+
+    Args:
+        _transform_dict (dict):    Transformation properties (translation, rotation, scale) for the wall.
+        _wall_name (str):          The name of the wall object.
+        _brick_mat (str):          The material to apply to the wall.
+        _portrait_mats (list):     A list of portrait materials to apply to the frames.
+        _frame_edges_shader (str): The shader to apply to the frame edges.
+
+    Returns:
+        str: The name of the group containing the wall and frames.
+    """
+
     wall = cmds.polyCube(w = _transform_dict['sx'], h = _transform_dict['sy'], d = _transform_dict['sz'], name = _wall_name)[0]
     cmds.move(0, _transform_dict['sy'] / 2, 0)
 
@@ -104,6 +211,21 @@ def generate_single_wall(_transform_dict, _wall_name, _brick_mat, _portrait_mats
     return wall_with_frames
 
 def generate_walls(_brick_mat, _portrait_mats, _frame_edges_shader):
+    """
+    Generates and positions two walls with frames in the scene.
+
+    This function creates two walls, positions them relative to the scene, and
+    groups them under a single parent node.
+
+    Args:
+        _brick_mat (str):          The material to apply to the walls.
+        _portrait_mats (list):     A list of portrait materials to apply to the frames.
+        _frame_edges_shader (str): The shader to apply to the frame edges.
+
+    Returns:
+        None
+    """
+
     # left wall
     transform_dict = {'tx': -10.571,
                       'ty': -33,
@@ -128,6 +250,15 @@ def generate_walls(_brick_mat, _portrait_mats, _frame_edges_shader):
                ro = (0.0, -131.41189034927982, 0.0))
 
 def generate_floor():
+    """
+    Creates a floor plane for the scene.
+
+    The floor is a large flat plane positioned to act as the ground in the scene.
+
+    Returns:
+        str: The name of the floor object.
+    """
+
     floor = cmds.polyCube(d = 120, h = 0.2, w = 120)[0]
     cmds.xform(floor, t = [0, -33, 7], ro = [0, 48, 0])
 

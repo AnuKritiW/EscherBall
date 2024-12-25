@@ -1,7 +1,37 @@
+"""
+Configures lighting for the 3D scene.
+
+This module provides functions to:
+- Add and configure area and point lights.
+- Calculate light positions based on object normals.
+- Create realistic lighting setups for rendering.
+
+Functions:
+- setup_area_light():               Creates an Arnold area light with custom attributes.
+- get_face_normal_in_world_space(): Computes the normal vector of a polygon face.
+- setup_single_pt_light():          Adds a point light near a specific frame.
+- setup_pt_lights():                Generates multiple point lights for the scene.
+
+Details:
+- Uses Maya's Arnold renderer for area lights.
+- Lights are placed dynamically based on frame positions.
+"""
+
 import maya.cmds as cmds
 import maya.api.OpenMaya as om
 
 def setup_area_light():
+    """
+    Creates and configures an Arnold area light in the Maya scene.
+
+    This function ensures the Arnold plugin is loaded, creates an area light with a specific
+    name, and sets its properties such as color, intensity, and exposure. It also places the
+    light in the default light set.
+
+    Returns:
+        None
+    """
+
     # Ensure the Arnold plugin is loaded
     if not cmds.pluginInfo('mtoa', query=True, loaded=True):
         cmds.loadPlugin('mtoa')
@@ -28,6 +58,17 @@ def setup_area_light():
     cmds.connectAttr(f'{light_transform}.instObjGroups', 'defaultLightSet.dagSetMembers', nextAvailable=True)
 
 def get_face_normal_in_world_space(_mesh, _face_index=0):
+    """
+    Calculates the world-space normal vector for a specified face of a mesh.
+
+    Args:
+        _mesh (str): The name of the mesh object.
+        _face_index (int): The index of the face to calculate the normal for. Defaults to 0.
+
+    Returns:
+        list: A normalized vector [x, y, z] representing the face's normal in world space.
+    """
+
     # Create a selection list and get the DAG path
     sel_list = om.MSelectionList()
     sel_list.add(_mesh)
@@ -43,6 +84,20 @@ def get_face_normal_in_world_space(_mesh, _face_index=0):
     return [normal_vector.x, normal_vector.y, normal_vector.z]
 
 def setup_single_pt_light(_frame):
+    """
+    Creates a point light positioned relative to a frame's front face normal.
+
+    This function calculates the position of the light based on the normal vector
+    of the front face of the given frame. The light's intensity is dynamically adjusted
+    based on its height in the scene.
+
+    Args:
+        _frame (str): The name of the frame object to position the light near.
+
+    Returns:
+        str: The name of the created point light shape.
+    """
+
     # Get the current position of the frame
     pos = cmds.xform(_frame, query=True, worldSpace=True, translation=True)
 
@@ -77,6 +132,17 @@ def setup_single_pt_light(_frame):
     return light_shape
 
 def setup_pt_lights():
+    """
+    Creates and groups point lights for all rectangular frames in the scene.
+
+    This function iterates over all rectangular frame objects, creates a point light for
+    each frame using `setup_single_pt_light()`, and groups the resulting lights under a
+    single parent node.
+
+    Returns:
+        str: The name of the group containing all created point lights.
+    """
+
     rectangular_frames = cmds.ls('Rectangular_Frame*', long=True) # Name decided in scene.create_frame
     pt_lights = []
 

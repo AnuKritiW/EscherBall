@@ -1,19 +1,43 @@
+"""
+Manages materials and shaders for the scene.
+
+This module provides functions to:
+- Create materials for portraits, bricks, and emissive shaders.
+- Assign materials to scene objects.
+- Import existing materials from external files.
+
+Functions:
+- prep_single_portrait_mat():  Creates a single portrait material with looping animation.
+- prep_portrait_mats():        Prepares portrait materials from image sequences.
+- prep_brick_mat():            Creates a brick material for walls.
+- assign_material_to_object(): Assigns a material to a specific object.
+- import_mat():                Imports materials from external Maya binary files.
+- prep_emissive_shader():      Creates and configures an emissive shader.
+
+Details:
+- Portrait materials use dynamic frame extensions for animation.
+- Brick textures are tiled for realistic appearance.
+"""
+
 import os
 import maya.cmds as cmds
 
-def prep_portrait_mats(_script_dir):
-
-    portraits = ['slytherin', 'gryffindor', 'ravenclaw', 'hufflepuff', 'greylady', 'bloodybaron', 'nick', 'fatfriar', 'peeves', 'dumbledore']
-    portrait_mats = []
-
-    for portrait in portraits:
-        portrait_mats.append(prep_single_portrait_mat(_script_dir, portrait, 0))
-        portrait_mats.append(prep_single_portrait_mat(_script_dir, portrait, 1.5))
-        portrait_mats.append(prep_single_portrait_mat(_script_dir, portrait, 3))
-
-    return portrait_mats
-
 def prep_single_portrait_mat(_script_dir, _portrait, _offset_level):
+    """
+    Prepares a single portrait material with looping animation.
+
+    This function creates a material for a specific portrait, links it to an image sequence,
+    and configures it for looping playback with a specified offset.
+
+    Args:
+        _script_dir (str): The directory path where the portrait textures are stored.
+        _portrait (str): The name of the portrait image to use.
+        _offset_level (float): The offset level to apply to the animation loop.
+
+    Returns:
+        str: The name of the created material.
+    """
+
     image_sequence_path = os.path.join(_script_dir, 'portraits', f'{_portrait}_seq', f'{_portrait}_1.png')
 
     # Create a new material (Lambert or Phong)
@@ -60,7 +84,42 @@ def prep_single_portrait_mat(_script_dir, _portrait, _offset_level):
 
     return portrait_mat
 
+def prep_portrait_mats(_script_dir):
+    """
+    Prepares multiple portrait materials for the frames.
+
+    This function generates variations of portrait materials with different offsets for looping animations.
+
+    Args:
+        _script_dir (str): The directory path where portrait textures are stored.
+
+    Returns:
+        list: A list of generated portrait material names.
+    """
+
+    portraits = ['slytherin', 'gryffindor', 'ravenclaw', 'hufflepuff', 'greylady', 'bloodybaron', 'nick', 'fatfriar', 'peeves', 'dumbledore']
+    portrait_mats = []
+
+    for portrait in portraits:
+        portrait_mats.append(prep_single_portrait_mat(_script_dir, portrait, 0))
+        portrait_mats.append(prep_single_portrait_mat(_script_dir, portrait, 1.5))
+        portrait_mats.append(prep_single_portrait_mat(_script_dir, portrait, 3))
+
+    return portrait_mats
+
 def prep_brick_mat(_script_dir):
+    """
+    Prepares a brick material for the walls.
+
+    This function creates a material, assigns a brick texture, and configures UV tiling.
+
+    Args:
+        _script_dir (str): The directory path where the brick texture is stored.
+
+    Returns:
+        str: The name of the created brick material.
+    """
+
     texture_file_path = os.path.join(_script_dir, 'textures', 'brick-wall-texture.jpg')
 
     # Create a Lambert material
@@ -93,10 +152,35 @@ def prep_brick_mat(_script_dir):
     return material
 
 def assign_material_to_object(_mat, _obj):
+    """
+    Assigns a material to a specific object in the scene.
+
+    Args:
+        _mat (str): The name of the material to assign.
+        _obj (str): The name of the object to which the material is applied.
+
+    Returns:
+        None
+    """
+
     cmds.select(_obj)
     cmds.hyperShade(assign=_mat)
 
 def import_mat(_script_dir, _mat_name):
+    """
+    Imports a material from a Maya Binary (.mb) file.
+
+    This function loads a material from an external file, identifies the imported materials,
+    and returns the name of the first Arnold Standard Surface material found.
+
+    Args:
+        _script_dir (str): The directory path where the .mb file is located.
+        _mat_name (str): The name of the material to import.
+
+    Returns:
+        str or None: The name of the imported Arnold Standard Surface material, or None if not found.
+    """
+
     # List materials in the scene before import
     materials_before_import = set(cmds.ls(materials=True))
 
@@ -120,6 +204,22 @@ def import_mat(_script_dir, _mat_name):
     return None
 
 def prep_emissive_shader(_shader_name, _emission_color=(1, 1, 1), _intensity=40, _obj=None):
+    """
+    Prepares an emissive shader and optionally assigns it to an object.
+
+    This function creates an Arnold Standard Surface shader, enables emission, and sets the
+    emission color and intensity. If an object is provided, the shader is assigned to it.
+
+    Args:
+        _shader_name (str): The name of the shader to create.
+        _emission_color (tuple): A tuple (R, G, B) representing the emissive color. Defaults to (1, 1, 1).
+        _intensity (float): The intensity of the emission. Defaults to 40.
+        _obj (str, optional): The name of the object to which the shader will be applied. Defaults to None.
+
+    Returns:
+        str: The name of the created shader.
+    """
+
     # Create an Arnold Standard Surface shader
     shader = cmds.shadingNode('aiStandardSurface', asShader=True, name=_shader_name)
 

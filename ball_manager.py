@@ -1,3 +1,23 @@
+"""
+Manages the ball animation and interactions.
+
+This module contains functions to:
+- Create the ball geometry.
+- Animate the ball along the staircase.
+- Calculate its position and ensure seamless looping.
+
+Functions:
+- generate_ball():        Generates the ball's geometry.
+- setup_ball_animation(): Prepares the ball and applies the animation.
+- get_stairs_info():      Retrieves information about all stairs in the scene.
+- get_top_center():       Computes the top-center position of a staircase step.
+- animate_ball():         Sets keyframes for the ball's motion.
+- get_interpolated_vals(): Calculates interpolated values between two points.
+
+Key Details:
+- Ball animations rely on step positions derived from `get_stairs_info()`.
+"""
+
 import maya.cmds as cmds
 import random
 
@@ -10,21 +30,21 @@ def get_interpolated_vals(_t, _start_pt, _end_pt):
         for idx in range(3)
     ]
 
-"""
-Animate the specified ball object along a series of fixed points.
-
-The ball moves between each point in the provided list `fixed_pts`, setting keyframes for each position over a specified duration and frame rate.
-The function calculates the interval for keyframes based on the total number of points and animates the ball to give the appearance of bouncing down steps.
-
-Parameters:
-    _ball (str): The name of the ball object to animate.
-    _ball_shader (str) : The name of the ball shader to change the emissive color.
-    _step_top_coords (list): A list of tuples representing the (x, y, z) coordinates for the ball to traverse.
-"""
-
 def animate_ball(_ball, _ball_shader, _step_top_coords):
     """
-    Animate the ball and change its emissive color every time it lands on a step.
+    Animates the specified ball object along a series of fixed points, changing its emissive color each time it lands on a step.
+
+    This function moves the ball between each point in the provided `step_top_coords` list, setting keyframes for its position to create a bouncing effect. 
+    It calculates keyframe intervals based on the total number of points and ensures smooth movement. The ball's emissive color is updated via the shader 
+    every time it lands on a step.
+
+    Args:
+        _ball (str): The name of the ball object to animate.
+        _ball_shader (str): The name of the shader applied to the ball, used to change its emissive color.
+        _step_top_coords (list): A list of tuples representing the (x, y, z) coordinates for the ball to traverse.
+
+    Returns:
+        None
     """
     fps = 25
     duration = 10 # Total duration of the animation in seconds
@@ -98,6 +118,16 @@ def animate_ball(_ball, _ball_shader, _step_top_coords):
     cmds.setKeyframe(_ball, t=total_frames, attribute='scaleZ', value=1)
 
 def get_top_centre(p_step_name):
+    """
+    Calculates the top center coordinate of a given step.
+
+    Args:
+        step_name (str): The name of the step object in the scene.
+
+    Returns:
+        list: A list of [x, y, z] coordinates representing the top center of the step.
+    """
+
     # Get the bounding box of the step
     bounding_box = cmds.xform(p_step_name, query=True, boundingBox=True, ws=True) # [xmin, ymin, zmin, xmax, ymax, zmax].
 
@@ -109,21 +139,27 @@ def get_top_centre(p_step_name):
 
     return top_center
 
-"""
-Create a dictionary of the stairs information in the scene.
-The dictionary will follow the structure below
-keys: string names
-values: list of tuples
-        each tuple contains the step name at [0] and the center coordinate at [1]
-e.g.
-stair_info
-{
-    'First_Step' : [('First_Step', (x, y, z))],
-    'Flight_of_Stairs_1' : [('pCube1', (x, y, z)), ('pCube2', (x, y, z), ...)]
-    ...
-}
-"""
 def get_stairs_info():
+    """
+    Retrieves detailed information about all stairs in the scene and organizes it into a structured dictionary.
+
+    The resulting dictionary contains:
+    - Keys: Names of stair groups (e.g., 'First_Step', 'Flight_of_Stairs_1').
+    - Values: Lists of tuples, where each tuple contains:
+        - [0]: The name of a step within the group.
+        - [1]: The (x, y, z) coordinates of the top center of the step.
+
+    Example:
+        {
+            'First_Step': [('First_Step', (x, y, z))],
+            'Flight_of_Stairs_1': [('pCube1', (x, y, z)), ('pCube2', (x, y, z))],
+            ...
+        }
+
+    Returns:
+        dict: A dictionary containing the names of stairs as keys and their respective step information as values.
+    """
+
     stairs_info = {'First_Step' : [('First_Step', get_top_centre('First_Step'))]}
 
     for flight_idx in range(1,5): #TODO: abstract out number of flights of stairs
@@ -136,6 +172,20 @@ def get_stairs_info():
     return stairs_info
 
 def setup_ball_animation(_ball, _ball_shader):
+    """
+    Sets up the animation sequence for the ball.
+
+    This function initializes the ball's position and animates it along
+    the stairs' top coordinates.
+
+    Args:
+        ball (str): The name of the ball object to animate.
+        shader (str): The shader applied to the ball.
+
+    Returns:
+        str: The name of the ball object after animation setup.
+    """
+
     step_top_coords = [coord for value in get_stairs_info().values() for _, coord in value]
     step_top_coords.append(step_top_coords[0]) # To ensure the loop is complete
     step_top_coords.reverse()  # So the ball is descending instead of ascending
@@ -147,4 +197,10 @@ def setup_ball_animation(_ball, _ball_shader):
     return _ball
 
 def generate_ball():
+    """
+    Creates a ball object in the Maya scene.
+
+    Returns:
+        str: The name of the created ball object.
+    """
     return cmds.polySphere(radius=BALL_RADIUS)[0]

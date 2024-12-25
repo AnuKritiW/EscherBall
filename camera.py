@@ -1,6 +1,29 @@
+"""
+Camera Setup: Handles the creation and configuration of a perspective camera in the Maya scene.
+
+This module is responsible for:
+- Creating a perspective camera.
+- Positioning and orienting the camera for optimal scene framing.
+- Configuring camera attributes such as focal length.
+
+Functions:
+- set_perspective_camera(): Creates and configures a perspective camera in the scene.
+"""
+
 import maya.cmds as cmds
 
 def set_perspective_camera():
+    """
+    Creates and configures a perspective camera in the Maya scene.
+
+    This function sets up a perspective camera with predefined settings, including:
+    - Default position and orientation.
+    - Preconfigured focal length for the lens.
+
+    Returns:
+        str: The name of the created camera node.
+    """
+
     # Camera settings: retrieved by manually creating a camera and looking at the attribute values
     camera_name     = "Perspective_Stairs_Cam"
     translate       = (-1.556361341180433, 48.57076527730966, 27.76627236948046)

@@ -1,3 +1,16 @@
+"""
+Main script for the Maya project: Bouncing Ball on Escher's Impossible Staircase inspired by the Grand Staircase as seen in Harry Potter.
+
+This script initializes the scene, creates the staircase, animates the bouncing ball and sets up the lighting for the scene
+
+Dependencies:
+- ball_manager:     Functions for handling ball animation.
+- scene:            Functions for scene creation.
+- scene_lighting:   Functions for lighting setup.
+- escher_stairs:    Functions for generating the staircase.
+- material_manager: Functions for material and shading management.
+"""
+
 import maya.cmds as cmds
 import importlib.util
 import os
