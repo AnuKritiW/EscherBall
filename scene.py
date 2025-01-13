@@ -129,7 +129,7 @@ def generate_frame(_width, _height):
     frame = cmds.polyCube(w = _width, h = _height, d = 0.2, name = "Rectangular_Frame")[0]
     return (frame, _width, _height)
 
-def hang_frames(_portrait_mats, _frame_edges_shader):
+def hang_frames(_portrait_mats, _frame_edges_shaders):
     """
     Generates and places multiple frames on the wall.
 
@@ -138,7 +138,7 @@ def hang_frames(_portrait_mats, _frame_edges_shader):
 
     Args:
         _portrait_mats (list):     A list of portrait material names to apply to the frames.
-        _frame_edges_shader (str): The shader to apply to the frame edges.
+        _frame_edges_shaders (list): A list of shaders to apply to the frame edges.
 
     Returns:
         list: A list of frame object names successfully placed on the wall.
@@ -168,13 +168,24 @@ def hang_frames(_portrait_mats, _frame_edges_shader):
             if fr_width > fr_height:
                 cmds.polyEditUV(frame + '.f[0]', r=True, angle=90)  # Rotate the UVs by 90 degrees
 
-            apply_emissive_texture_to_faces(frame, _frame_edges_shader)
+            # Determine the frame's height and pick the shader accordingly
+            pos = cmds.xform(frame, query=True, worldSpace=True, translation=True)
+            y_position = pos[1]  # Y-coordinate of the frame
+
+            # Map the Y position to an index in the shader list
+            max_height = SQ_WALL_SIZE
+            shader_index = int((1 - (y_position / max_height)) * (len(_frame_edges_shaders)))
+            shader_index = max(0, min(shader_index, len(_frame_edges_shaders) - 1))  # Clamp to valid range
+            print("Shader Index: ", shader_index)
+
+            frame_edges_shader = _frame_edges_shaders[shader_index]
+            apply_emissive_texture_to_faces(frame, frame_edges_shader)
 
             frame_list.append(frame)
 
     return frame_list
 
-def generate_single_wall(_transform_dict, _wall_name, _brick_mat, _portrait_mats, _frame_edges_shader):
+def generate_single_wall(_transform_dict, _wall_name, _brick_mat, _portrait_mats, _frame_edges_shaders):
     """
     Generates a single wall with frames and applies materials.
 
@@ -186,7 +197,7 @@ def generate_single_wall(_transform_dict, _wall_name, _brick_mat, _portrait_mats
         _wall_name (str):          The name of the wall object.
         _brick_mat (str):          The material to apply to the wall.
         _portrait_mats (list):     A list of portrait materials to apply to the frames.
-        _frame_edges_shader (str): The shader to apply to the frame edges.
+        _frame_edges_shaders (list): A list of shaders to apply to the frame edges.
 
     Returns:
         str: The name of the group containing the wall and frames.
@@ -198,7 +209,7 @@ def generate_single_wall(_transform_dict, _wall_name, _brick_mat, _portrait_mats
     cmds.select(wall)
     cmds.hyperShade(assign=_brick_mat)
 
-    frames_list = hang_frames(_portrait_mats, _frame_edges_shader)
+    frames_list = hang_frames(_portrait_mats, _frame_edges_shaders)
     frames_grp = cmds.group(frames_list, name = "Frames")
 
     wall_with_frames = cmds.group([wall, frames_grp], name = (_wall_name + "_with_Frames"))
@@ -210,7 +221,7 @@ def generate_single_wall(_transform_dict, _wall_name, _brick_mat, _portrait_mats
 
     return wall_with_frames
 
-def generate_walls(_brick_mat, _portrait_mats, _frame_edges_shader):
+def generate_walls(_brick_mat, _portrait_mats, _frame_edges_shaders):
     """
     Generates and positions two walls with frames in the scene.
 
@@ -220,7 +231,7 @@ def generate_walls(_brick_mat, _portrait_mats, _frame_edges_shader):
     Args:
         _brick_mat (str):          The material to apply to the walls.
         _portrait_mats (list):     A list of portrait materials to apply to the frames.
-        _frame_edges_shader (str): The shader to apply to the frame edges.
+        _frame_edges_shaders (list): A list of shaders to apply to the frame edges.
 
     Returns:
         None
@@ -236,13 +247,13 @@ def generate_walls(_brick_mat, _portrait_mats, _frame_edges_shader):
                       'sx': SQ_WALL_SIZE,
                       'sy': SQ_WALL_SIZE,
                       'sz': 0.2}
-    left_wall = generate_single_wall(transform_dict, "Left_Wall",   _brick_mat, _portrait_mats, _frame_edges_shader)
+    left_wall = generate_single_wall(transform_dict, "Left_Wall",   _brick_mat, _portrait_mats, _frame_edges_shaders)
 
     # right wall
     transform_dict['tx'] = -42.995
     transform_dict['tz'] = 8.603
     transform_dict['ry'] = 89.478 # Rotate to help with the illusion
-    right_wall = generate_single_wall(transform_dict, "Right_Wall", _brick_mat, _portrait_mats, _frame_edges_shader)
+    right_wall = generate_single_wall(transform_dict, "Right_Wall", _brick_mat, _portrait_mats, _frame_edges_shaders)
 
     walls_grp = cmds.group([left_wall, right_wall], name = "Walls")
     cmds.xform(walls_grp,

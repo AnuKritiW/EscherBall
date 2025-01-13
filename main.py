@@ -15,7 +15,8 @@ import maya.cmds as cmds
 import importlib.util
 import os
 
-SCRIPT_DIR = r'/Users/Exhale/Desktop/CAVE/maya-scripts'
+# SCRIPT_DIR = r'/Users/Exhale/Desktop/CAVE/maya-scripts'
+SCRIPT_DIR = r'/home/s5647918/Code/maya-scripts'
 
 # Function to dynamically import a module from a file
 def import_module(module_name, file_path):
@@ -55,10 +56,26 @@ def main():
     # Get materials needed for walls
     brick_mat         = material_manager.prep_brick_mat(SCRIPT_DIR)
     portrait_mats     = material_manager.prep_portrait_mats(SCRIPT_DIR)
-    frame_edge_shader = material_manager.prep_emissive_shader(_shader_name="frame_emissive_shader", _emission_color=(0.6, 0.8, 1.0), _intensity=5)
+
+    intensities = [6, 5, 4, 3, 1]
+    colors = [
+        (0.6, 0.7, 1.0),
+        (0.7, 0.75, 0.85),
+        (0.8, 0.8, 0.7),
+        (0.85, 0.85, 0.6),
+        (0.9, 0.9, 0.9)
+    ]
+
+    frame_edge_shaders = [
+        material_manager.prep_emissive_shader(
+            _shader_name="frame_emissive_shader",
+            _emission_color=color,
+            _intensity=intensity
+        ) for intensity, color in zip(intensities, colors)
+    ]
 
     # Generate walls
-    scene.generate_walls(brick_mat, portrait_mats, frame_edge_shader)
+    scene.generate_walls(brick_mat, portrait_mats, frame_edge_shaders)
 
     # Generate floor model
     floor = scene.generate_floor()
