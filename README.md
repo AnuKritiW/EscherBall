@@ -54,7 +54,7 @@ The source files have been included in the `textures/` directory and can be manu
 
 Alternatively, the two prebuilt materials were sourced from [Poliigon](https://www.poliigon.com/), which offers a [material converter](https://www.poliigon.com/maya) tool that can also be used to build the materials manually.
 
-References:
+## References:
 ```
 Autodesk, 2024. Maya 2024 Technical Documentation Python. [online] Available from: https://help.autodesk.com/view/MAYAUL/2024/ENU/?guid=__CommandsPython_index_html [Accessed 1 October 2024].
 Escher, M. C., 1960. Ascending and Descending [Lithograph]. mcescher.com: The M.C. Escher Company.
