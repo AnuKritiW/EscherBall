@@ -1,73 +1,69 @@
-# Impossible Staircase
+# Bouncing Ball
 
-The inspiration for this scene is the grand staircase from Harry Potter.
+## Overview
 
-<p>
-  <img src="./ref-images/scene/stairs-ref-1.jpg" width="400" />
-</p>
+This project is a **procedurally generated animation** of a bouncing ball interacting with an **impossible staircase**, inspired by **MC Escher’s "Ascending and Descending"** and the **Grand Staircase from Harry Potter**. The animation is fully scripted in **Python within Maya**, incorporating procedural modeling, dynamic materials, and custom lighting setups.
 
-## Ball
+Key features include:
 
-The Quaffle (used in Harry Potter's Quidditch) is made of leather
+* **Procedural Staircase** – Fully scripted model inspired by Escher's impossible geometry.
+* **Bouncing Ball Animation** – Implements squash & stretch for realistic motion.
+* **Dynamic Portrait Textures** – Animated moving portraits, referencing Harry Potter's Grand Staircase.
+* **Custom Lighting & Materials** – Procedural shading & emissive textures to enhance the scene.
+* **Scripted Camera Setup** – Ensures the perfect illusion perspective is maintained.
 
-<p>
-  <img src="./ref-images/ball/quaffle-1.png" width="400">
-  <img src="./ref-images/ball/quaffle-2.jpg" width="500">
-</p>
+This project balances **technical scripting with artistic composition**, creating a visually striking and algorithmically controlled scene.
 
+## Demo Videos
 
-## Frames
+Watch the full demo [here](https://youtu.be/Q9KEmYCoY3g).
 
-The plan is to enclose the impossible staircase in an enclosed room, with frames of various sizes on the walls. 
+![image](./Refs/BouncingBall.gif)
 
-I hope to project looped images on the walls to emulate the magical portraits in Harry Potter.
+## How to run the Project
 
-<p>
-  <img src="./ref-images/frames/stairs-ref-2.jpg" width="300" />
-  <img src="./ref-images/frames/stairs-ref-4.jpg" width="400" /> 
-  <img src="./ref-images/frames/stairs-ref-17.jpg" width="400" /> 
-  <img src="./ref-images/frames/stairs-ref-18.jpg" width="400" /> 
-</p>
+1. **Open the Script Editor in Maya** 
+    - `Windows > General Editors > Script Editor`
 
-## Banisters
+2. **Open the Main Script**
+    - In the Script Editor, go to `File > Open Script...`
+    - Navigate to the `scripts/` directory in the submission folder and select `main.py`.
 
-<p>
-  <img src="./ref-images/banisters/stairs-ref-10.jpg" width="300" /> 
-  <img src="./ref-images/banisters/stairs-ref-11.jpg" width="300" />
-  <img src="./ref-images/banisters/stairs-ref-12.jpg" width="300" />
-  <img src="./ref-images/banisters/stairs-ref-14.jpg" width="300" /> 
-  <img src="./ref-images/banisters/stairs-ref-15.jpg" width="300" />
-  <img src="./ref-images/banisters/stairs-ref-13.jpg" width="300" />
-  <img src="./ref-images/banisters/stairs-ref-16.jpg" width="300" />
-</p>
+3. **Update the Script Path**
+    - Inside the `main.py` script, update the `SCRIPT_DIR` variable to the full path where the `scripts/` directory is located on your machine. For example:
+    ```
+    SCRIPT_DIR = r"C:/Users/YourName/Desktop/Maya/scripts"
+    ```
 
-## Hallway
+4. **Run the Script**
+    - Select all lines in the Script Editor and press the `Play` button to execute the script. Alternatively, you can press `Ctrl+Enter` (Windows) or `Cmd+Enter` (Mac) to execute the script.
 
-I plan to create an opening in the wall (either there the whole time, or ones that magically form and disappear). The plan is to have the ball bounce in/out of the scene through these hallways. It would also be cool to have either additional staircases that moved as in the movies, or if the impossible staircase moved out of the illusion into the hallway(s) at the end of the ten seconds.
+5. **Materials**
+    - If the materials (e.g., marble stairs or ground tiles) do not load correctly:
+        - Use the `.mb` files in the `textures/` directory to import pre-built materials.
+        - Alternatively, manually recreate the materials using the provided texture files in the `marble/` and `tile-2/` folders.
+        - Refer to [Notes on materials](#notes-on-materials) for more information.
 
-<p>
-  <img src="./ref-images/hallway/stairs-ref-5.jpg" width="400" /> 
-  <img src="./ref-images/hallway/stairs-ref-6.jpg" width="400" />
-  <img src="./ref-images/hallway/stairs-ref-3.jpg" width="300" />
-  <img src="./ref-images/hallway/stairs-ref-8.jpg" width="400" />
-  <img src="./ref-images/hallway/stairs-ref-19.jpg" width="400" />
-  <img src="./ref-images/hallway/stairs-ref-20.jpg" width="400" />
-  <img src="./ref-images/hallway/stairs-ref-21.jpg" width="400" />
-</p>
+## Notes on materials
 
-## Windows
+The `.mb` files for prebuilt materials may work but could have texture path issues depending on your setup. This may prevent them from loading correctly in the project.
 
-If there is time to create windows.
+The source files have been included in the `textures/` directory and can be manually created using Maya's Hypershade.
+- Use the Arnold Standard Surface material.
+- Assign the provided texture maps to the appropriate inputs (e.g., base color, normal, metallic, roughness).
 
-<p>
-  <img src="./ref-images/windows/stairs-ref-7.jpg" width="400" /> 
-  <img src="./ref-images/windows/stairs-ref-9.jpg" width="300" />
-</p>
+Alternatively, the two prebuilt materials were sourced from [Poliigon](https://www.poliigon.com/), which offers a [material converter](https://www.poliigon.com/maya) tool that can also be used to build the materials manually.
 
-
-
-## Misc.
-
-### suggested refs to look up
-guggenheim museum frank lloyd wright
-texture projection
+References:
+```
+Autodesk, 2024. Maya 2024 Technical Documentation Python. [online] Available from: https://help.autodesk.com/view/MAYAUL/2024/ENU/?guid=__CommandsPython_index_html [Accessed 1 October 2024].
+Escher, M. C., 1960. Ascending and Descending [Lithograph]. mcescher.com: The M.C. Escher Company.
+Harry Potter and the Philosopher's Stone, 2001. [Film] Directed by Chris Columbus. USA: Warner Bros. Pictures.
+Morimoto, A., 2023. Make your own moving portrait. www.timeout.com: TimeOut. Available from: https://www.timeout.com/tokyo/attractions/guide-to-warner-bros-studio-tour-tokyo-the-making-of-harry-potter [Accessed 22 October 2024].
+Poliigon., Denali Polished Quartzite Stone Texture, Gray. Available from: https://www.poliigon.com/texture/denali-polished-quartzite-stone-texture-gray/8060#license-info [Accessed 11 November 2024].
+Poliigon., Square Slate Raw Tile Texture, Black. Available from: https://www.poliigon.com/texture/square-slate-raw-tile-texture-black/7657 [Accessed 11 November 2024].
+saragnzalez, Brick wall texture. Freepik. Available from: https://www.freepik.com/free-photo/brick-wall-texture_1237699.htm [Accessed 11 November 2024].
+Wizarding World Digital., 2017. The Hogwarts ghosts. Available from: https://www.harrypotter.com/features/hogwarts-ghosts [Accessed 22 October 2024].
+Wizarding World Digital., 2017. The stories of the Hogwarts founders. Available from: https://www.harrypotter.com/features/stories-of-the-hogwarts-founders [Accessed 22 October 2024].
+Wizarding World Digital., 2019. How do magical portraits actually work?. Available from: https://www.harrypotter.com/features/how-do-magical-portraits-actually-work [Accessed 22 October 2024].
+```
